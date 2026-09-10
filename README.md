@@ -22,7 +22,32 @@ A quiet, native macOS wallpaper app for astronomy. Real observations, a little k
 
 **한국어:** **콘텐츠 업데이트**를 누르면 ESA/Webb와 ESA/Hubble의 최근 관측 이미지를 찾아 다운로드하고, 공식 설명을 기기에서 번역해 한 번에 최대 세 개의 콘텐츠를 보관함에 추가합니다. **새 콘텐츠 보기**에서 고른 뒤 배경화면으로 설정하거나 자동 변경을 켤 수 있습니다. 업데이트만으로 현재 배경화면이 바뀌지는 않습니다. 처음에는 macOS가 번역 언어 다운로드 동의를 요청할 수 있습니다. 기계 번역 표시와 원문 출처·이미지 크레딧이 함께 제공됩니다.
 
-## Run locally
+## 安装与首次打开 / Install and open / 설치 및 실행
+
+### 中文
+
+当前下载包适用于 **Apple Silicon（M 系列芯片）Mac**，要求 macOS 15 或更新版本；macOS 15 的实际运行仍待验证。使用下载包无需安装 Xcode 或开发工具。此开发预览尚未经过 Apple 公证，首次打开可能被 macOS 拦截。
+
+1. 打开本仓库的 [Releases 下载页](https://github.com/ykopp/starfolio-wallpaper/releases)，选择版本下的 **Assets**，下载 `Starfolio-版本号-macOS-arm64.zip`，不要选择 `Source code`。
+2. 双击 ZIP 解压，将 `Starfolio.app` 拖入 Finder 的「应用程序」文件夹。如果更新旧版，先从星笺菜单退出应用，再替换旧的 `.app`；已下载图库保存在应用之外。
+3. 在「应用程序」中双击星笺。如果提示「无法验证开发者」或「Apple 无法检查是否包含恶意软件」，先关闭提示。确认文件来自本仓库的发布页后，打开 **苹果菜单 → 系统设置 → 隐私与安全性**，向下找到星笺被阻止的记录，点击 **「仍要打开」**，按提示输入登录密码或使用 Touch ID，再确认「打开」。这是针对这个应用的单独放行；不需要关闭 Mac 的整体安全保护。操作依据：[Apple 官方打开指引](https://support.apple.com/zh-cn/102445)。
+4. 成功打开后，可以先浏览内置图片，选好后点击「设为壁纸」。「内容更新」需要联网，首次制作可能由 macOS 提示下载翻译语言；允许后即可制作中英韩新内容。
+
+**遇到其他提示：** 如果没有「仍要打开」，重新双击一次应用后再查看设置；该入口通常在尝试打开后的一小时内可用，受单位管理的 Mac 也可能限制此操作。若提示「已损坏」、明确检测到恶意软件，或放行后仍无法启动，请不要把它当成普通未公证提示强行绕过：先从发布页重新下载；仍有问题时，在 [Issues](https://github.com/ykopp/starfolio-wallpaper/issues) 附上完整报错、macOS 版本、芯片型号和应用版本。[Apple 关于未知开发者应用的说明](https://support.apple.com/zh-cn/guide/mac-help/mh40616/mac)
+
+### English
+
+The download is for Apple Silicon Macs running macOS 15 or later; macOS 15 runtime compatibility is not yet verified. Download the `macOS-arm64.zip` from [Releases](https://github.com/ykopp/starfolio-wallpaper/releases), unzip it, and drag `Starfolio.app` into Applications. Quit the previous version before replacing it. No developer tools are required.
+
+This preview is not Apple-notarized. If macOS blocks it because the developer cannot be verified, first attempt to open it, then—after confirming you downloaded it from this repository—go to **System Settings → Privacy & Security → Open Anyway** and confirm. Do not disable system-wide protection. For damaged-app or detected-malware alerts, re-download and report persistent errors rather than bypassing them. See [Apple’s instructions](https://support.apple.com/en-us/102445). Content updates may first request permission to download translation languages.
+
+### 한국어
+
+다운로드 파일은 macOS 15 이상을 사용하는 Apple Silicon Mac용이며, macOS 15에서의 실제 실행은 아직 검증하지 않았습니다. [Releases](https://github.com/ykopp/starfolio-wallpaper/releases)에서 `macOS-arm64.zip`을 받아 압축을 풀고, `Starfolio.app`을 응용 프로그램 폴더로 옮기세요. 기존 버전은 종료한 뒤 교체하세요. 개발 도구는 필요하지 않습니다.
+
+이 미리 보기 버전은 Apple 공증을 받지 않았습니다. 개발자를 확인할 수 없다는 이유로 차단되면, 이 저장소에서 받은 파일인지 확인한 뒤 **시스템 설정 → 개인정보 보호 및 보안 → 확인 없이 열기**에서 실행을 허용하세요. 시스템 전체의 보안 기능을 끌 필요는 없습니다. 손상 또는 악성 소프트웨어 감지 경고는 일반적인 개발자 확인 경고와 구분하고, 다시 다운로드한 뒤에도 문제가 있으면 Issues에 알려 주세요. [Apple 공식 안내](https://support.apple.com/ko-kr/102445)를 참고하세요. 콘텐츠 업데이트 시 번역 언어 다운로드 동의가 필요할 수 있습니다.
+
+## Build from source
 
 macOS 15 or later, Swift 6.1 or later, Xcode or compatible Command Line Tools. No account, API key or network connection is needed to use the bundled images. Opening source links uses your browser.
 
