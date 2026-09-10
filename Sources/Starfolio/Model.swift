@@ -55,7 +55,8 @@ struct DisplayResult: Identifiable {
   let succeeded: Bool
 }
 @MainActor final class StarModel: ObservableObject {
-  let catalog: SkyCatalog
+  @Published private(set) var catalog: SkyCatalog
+  let contentUpdater: ContentUpdater
   let defaults: UserDefaults
   let directory: URL
   let isolated: Bool
@@ -116,8 +117,19 @@ struct DisplayResult: Identifiable {
   func text(_ key: Copy) -> String { key.text(language) }
   init(
     catalog: SkyCatalog, defaults: UserDefaults = .standard, directory: URL? = nil,
-    isolated: Bool = false, desktop: (any DesktopApplying)? = nil
+    isolated: Bool = false, desktop: (any DesktopApplying)? = nil,
+    contentDiscovery: (@Sendable (SkyCatalog) async throws -> DiscoveryBatch)? = nil,
+    contentTranslation: (@MainActor ([String], SkyLanguage) async throws -> [String])? = nil
   ) {
+    let root =
+      directory
+      ?? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+      .appendingPathComponent("Starfolio/rendered")
+    let updates = ContentUpdater(
+      base: catalog, root: root.appendingPathComponent("library"), discover: contentDiscovery,
+      translation: contentTranslation)
+    self.contentUpdater = updates
+    let catalog = updates.catalog
     self.catalog = catalog
     self.defaults = defaults
     self.isolated = isolated
@@ -140,6 +152,10 @@ struct DisplayResult: Identifiable {
     }
     desiredID = defaults.string(forKey: "desiredID") ?? appliedID
     pendingRotationID = defaults.string(forKey: "pendingRotationID")
+    updates.onCatalog = { [weak self] updated in
+      self?.catalog = updated
+      // Adding cards never changes selection, desktop, or the rotation schedule.
+    }
     refreshPreview()
     configureTimer()
     if !isolated {
@@ -306,6 +322,7 @@ struct DisplayResult: Identifiable {
   }
   func stop() {
     stopped = true
+    contentUpdater.cancel()
     requestedApply = nil
     timer?.invalidate()
     previewTask?.cancel()

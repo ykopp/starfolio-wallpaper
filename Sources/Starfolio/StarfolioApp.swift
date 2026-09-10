@@ -1,6 +1,8 @@
 import AppKit
 import CelestialKit
+import ImageIO
 import SwiftUI
+import Translation
 
 @MainActor enum Session {
   static var model: StarModel!
@@ -17,6 +19,16 @@ import SwiftUI
     do {
       let catalog = try SkyCatalog.load()
       let args = CommandLine.arguments
+      if let i = args.firstIndex(of: "--inspect-library"), args.indices.contains(i + 1) {
+        let read = SkyLibrary(root: URL(fileURLWithPath: args[i + 1])).read(onto: catalog)
+        try read.catalog.validate(verifyImages: true)
+        guard read.unreadableBatches == 0 else { throw SkyError.invalidContent }
+        print("Library PASS: \(read.catalog.cards.count) cards")
+        for card in read.catalog.cards {
+          print("\(card.id) | \(card.title.zhHans) | \(card.title.en) | \(card.title.ko)")
+        }
+        return
+      }
       if args.contains("--verify") {
         try catalog.validate(verifyImages: true)
         if Bundle.main.bundleURL.pathExtension == "app"
@@ -132,10 +144,43 @@ struct WindowHook: NSViewRepresentable {
     DispatchQueue.main.async { if let window = nsView.window { register(window) } }
   }
 }
+@MainActor enum StarThumbnails {
+  static let cache: NSCache<NSURL, NSImage> = {
+    let cache = NSCache<NSURL, NSImage>()
+    cache.countLimit = 48
+    return cache
+  }()
+  static func image(_ url: URL) -> NSImage? {
+    if let image = cache.object(forKey: url as NSURL) { return image }
+    guard let source = CGImageSourceCreateWithURL(url as CFURL, nil),
+      let thumbnail = CGImageSourceCreateThumbnailAtIndex(
+        source, 0,
+        [
+          kCGImageSourceCreateThumbnailFromImageAlways: true,
+          kCGImageSourceThumbnailMaxPixelSize: 512,
+          kCGImageSourceCreateThumbnailWithTransform: true,
+        ] as CFDictionary)
+    else { return nil }
+    let image = NSImage(cgImage: thumbnail, size: .zero)
+    cache.setObject(image, forKey: url as NSURL)
+    return image
+  }
+}
 struct MainView: View {
   @ObservedObject var model: StarModel
+  @ObservedObject var updates: ContentUpdater
+  init(model: StarModel) {
+    self.model = model
+    self.updates = model.contentUpdater
+  }
   @State private var reading = false
   @State private var search = ""
+  @State private var onlyNew = false
+  private var visibleCards: [SkyCard] {
+    model.catalog.cards.filter {
+      $0.matches(search) && (!onlyNew || updates.addedIDs.contains($0.id))
+    }
+  }
   var body: some View {
     HStack(spacing: 0) {
       VStack(alignment: .leading, spacing: 20) {
@@ -146,21 +191,48 @@ struct MainView: View {
           }
         }.padding(.top, 12)
         Text(model.text(.library)).font(.headline)
+        VStack(alignment: .leading, spacing: 7) {
+          Button {
+            updates.start()
+          } label: {
+            Label(model.text(.update), systemImage: "arrow.down.circle")
+          }.disabled(updates.running)
+          if updates.running {
+            ProgressView().controlSize(.small)
+            Button(model.text(.cancelUpdate)) { updates.cancel() }
+          }
+          Text(model.text(updates.state)).font(.caption).foregroundStyle(.secondary)
+          if updates.warnings > 0 {
+            Text(model.text(.updateSkipped)).font(.caption2).foregroundStyle(.secondary)
+          }
+          if !updates.addedIDs.isEmpty {
+            Button {
+              onlyNew.toggle()
+            } label: {
+              Text(model.text(onlyNew ? .allImages : .showNew) + " · \(updates.addedIDs.count)")
+            }.font(.caption)
+
+          }
+        }
+
         TextField(model.text(.search), text: $search).textFieldStyle(.roundedBorder)
         ScrollView {
-          VStack(spacing: 12) {
-            ForEach(model.catalog.cards.filter { $0.matches(search) }) { card in
+          LazyVStack(spacing: 12) {
+            ForEach(visibleCards) { card in
               Button {
                 model.selectedID = card.id
               } label: {
                 VStack(alignment: .leading, spacing: 8) {
-                  if let image = NSImage(contentsOf: model.catalog.imageURL(card)) {
+                  if let image = StarThumbnails.image(model.catalog.imageURL(card)) {
                     Image(nsImage: image).resizable().aspectRatio(
                       contentMode: card.fit ? .fit : .fill
                     ).frame(height: 88).frame(maxWidth: .infinity).clipped().background(.black)
                       .clipShape(RoundedRectangle(cornerRadius: 6))
                   }
-                  Text(card.title.value(model.language)).font(.system(size: 13, weight: .medium))
+                  Text(
+                    (updates.addedIDs.contains(card.id) ? model.text(.newCard) + " · " : "")
+                      + card.title.value(model.language)
+                  ).font(.system(size: 13, weight: .medium))
                     .foregroundStyle(.primary)
                   Text(card.category.value(model.language)).font(.caption).foregroundStyle(
                     .secondary)
@@ -169,7 +241,7 @@ struct MainView: View {
                 ).clipShape(RoundedRectangle(cornerRadius: 9))
               }.buttonStyle(.plain)
             }
-            if model.catalog.cards.filter({ $0.matches(search) }).isEmpty {
+            if visibleCards.isEmpty {
               Text(model.text(.noMatches)).foregroundStyle(.secondary).padding(.top, 12)
             }
           }
@@ -249,7 +321,10 @@ struct MainView: View {
         .background(Color(white: 0.045))
     }.frame(minWidth: 1000, minHeight: 730).sheet(isPresented: $reading) {
       ReadingView(model: model)
+    }.translationTask(updates.configuration) { [requestID = updates.sessionRequestID] session in
+      await updates.handleSession(session, requestID: requestID)
     }
+    .onChange(of: updates.running) { _, running in if running { onlyNew = false } }
   }
 }
 struct ReadingView: View {

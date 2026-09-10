@@ -27,6 +27,11 @@ public struct SkyText: Codable, Hashable, Sendable {
   public let zhHans: String
   public let en: String
   public let ko: String
+  public init(zhHans: String, en: String, ko: String) {
+    self.zhHans = zhHans
+    self.en = en
+    self.ko = ko
+  }
   public func value(_ language: SkyLanguage) -> String {
     switch language {
     case .chinese: zhHans
@@ -40,6 +45,12 @@ public struct SkySection: Codable, Hashable, Identifiable, Sendable {
   public let title: SkyText
   public let text: SkyText
   public let sourceURL: URL
+  public init(id: String, title: SkyText, text: SkyText, sourceURL: URL) {
+    self.id = id
+    self.title = title
+    self.text = text
+    self.sourceURL = sourceURL
+  }
 }
 public struct SkyCard: Codable, Hashable, Identifiable, Sendable {
   public let id: String
@@ -69,7 +80,28 @@ public struct SkyCard: Codable, Hashable, Identifiable, Sendable {
 public struct SkyCatalog: Codable, Sendable {
   public let schemaVersion: Int
   public let version: String
-  public let cards: [SkyCard]
+  public private(set) var cards: [SkyCard]
+  private var imageRoots: [String: URL] = [:]
+  private enum CodingKeys: String, CodingKey { case schemaVersion, version, cards }
+  public init(version: String, cards: [SkyCard]) {
+    self.schemaVersion = 1
+    self.version = version
+    self.cards = cards
+  }
+  public func adding(_ addition: SkyCatalog, root: URL) -> SkyCatalog {
+    var result = self
+    let known = Set(cards.map(\.id))
+    for card in addition.cards where !known.contains(card.id) {
+      result.cards.append(card)
+      result.imageRoots[card.id] = root
+    }
+    return result
+  }
+  public func located(at root: URL) -> SkyCatalog {
+    var result = self
+    for card in cards { result.imageRoots[card.id] = root }
+    return result
+  }
   public static var root: URL {
     // SwiftPM's generated accessor looks beside the executable; an installed
     // macOS app keeps resource bundles inside Contents/Resources.
@@ -88,7 +120,9 @@ public struct SkyCatalog: Codable, Sendable {
     try result.validate(verifyImages: false)
     return result
   }
-  public func imageURL(_ card: SkyCard) -> URL { Self.root.appendingPathComponent(card.image) }
+  public func imageURL(_ card: SkyCard) -> URL {
+    (imageRoots[card.id] ?? Self.root).appendingPathComponent(card.image)
+  }
   public func validate(verifyImages: Bool) throws {
     guard schemaVersion == 1, !cards.isEmpty, Set(cards.map(\.id)).count == cards.count else {
       throw SkyError.invalidContent
@@ -96,7 +130,8 @@ public struct SkyCatalog: Codable, Sendable {
     for card in cards {
       guard card.id.range(of: "^[a-z0-9-]+$", options: .regularExpression) != nil,
         card.image.hasPrefix("assets/"), !card.image.contains(".."), !card.image.contains("\\"),
-        card.width > 0, card.height > 0, !card.sections.isEmpty,
+        card.width > 0, card.height > 0, card.width <= 16000, card.height <= 16000,
+        Int64(card.width) * Int64(card.height) <= 80_000_000, !card.sections.isEmpty,
         !card.credit.isEmpty, card.sourceURL.scheme == "https", card.licenseURL.scheme == "https"
       else { throw SkyError.invalidContent }
       let texts =

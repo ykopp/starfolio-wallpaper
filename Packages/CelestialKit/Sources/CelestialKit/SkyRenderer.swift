@@ -3,7 +3,7 @@ import ImageIO
 
 public enum SkyWallpaperMode: String, Codable, CaseIterable, Sendable { case knowledge, pure }
 @MainActor public enum SkyRenderer {
-  public static let version = 1
+  public static let version = 2
   public static func render(
     card: SkyCard, imageURL: URL, size: CGSize, language: SkyLanguage, mode: SkyWallpaperMode,
     directory: URL
@@ -87,6 +87,24 @@ public enum SkyWallpaperMode: String, Codable, CaseIterable, Sendable { case kno
           .paragraphStyle: para,
         ])
     }
+    func fittedFont(
+      _ value: String, rect: CGRect, maximum: CGFloat, minimum: CGFloat, weight: NSFont.Weight
+    ) -> CGFloat {
+      var font = maximum
+      let paragraph = NSMutableParagraphStyle()
+      paragraph.lineSpacing = 3 * unit
+      while font > minimum {
+        let measured = (value as NSString).boundingRect(
+          with: CGSize(width: rect.width, height: 10000),
+          options: [.usesLineFragmentOrigin, .usesFontLeading],
+          attributes: [
+            .font: NSFont.systemFont(ofSize: font, weight: weight), .paragraphStyle: paragraph,
+          ])
+        if measured.height <= rect.height { break }
+        font -= unit
+      }
+      return font
+    }
     if mode == .knowledge {
       let bottom = height * 0.11
       let factSize = 18 * unit
@@ -106,20 +124,28 @@ public enum SkyWallpaperMode: String, Codable, CaseIterable, Sendable { case kno
       if language != .english {
         text(
           card.title.en, CGRect(x: left, y: baseline, width: textWidth, height: 30 * unit),
-          20 * unit, .medium, NSColor(white: 0.85, alpha: 1))
+          fittedFont(
+            card.title.en, rect: CGRect(x: 0, y: 0, width: textWidth, height: 30 * unit),
+            maximum: 20 * unit, minimum: 12 * unit, weight: .medium), .medium,
+          NSColor(white: 0.85, alpha: 1))
         baseline += 37 * unit
       }
+      let titleRect = CGRect(x: left, y: baseline, width: textWidth, height: 65 * unit)
       text(
-        card.title.value(language),
-        CGRect(x: left, y: baseline, width: textWidth, height: 65 * unit), 44 * unit, .bold, .white)
+        card.title.value(language), titleRect,
+        fittedFont(
+          card.title.value(language), rect: titleRect, maximum: 44 * unit, minimum: 18 * unit,
+          weight: .bold), .bold, .white)
       baseline += 68 * unit
       text(
         card.subtitle.value(language),
         CGRect(x: left, y: baseline, width: textWidth, height: 26 * unit), 15 * unit, .medium,
         NSColor(red: 0.9, green: 0.85, blue: 0.76, alpha: 1))
     }
-    let creditSize = max(10, width * 0.0082)
-    let creditRect = CGRect(x: left, y: height * 0.045, width: textWidth, height: creditSize * 3)
+    let creditRect = CGRect(x: left, y: height * 0.035, width: textWidth, height: height * 0.060)
+    let creditSize = fittedFont(
+      card.credit, rect: creditRect, maximum: max(10, width * 0.0082), minimum: 8 * unit,
+      weight: .regular)
     if mode == .pure {
       ctx.setFillColor(NSColor.black.withAlphaComponent(0.4).cgColor)
       let measured = (card.credit as NSString).size(withAttributes: [
@@ -128,7 +154,7 @@ public enum SkyWallpaperMode: String, Codable, CaseIterable, Sendable { case kno
       ctx.fill(
         CGRect(
           x: left - 4, y: creditRect.minY, width: min(textWidth, measured.width + 8),
-          height: creditSize * 1.8))
+          height: creditRect.height))
     }
     text(card.credit, creditRect, creditSize, .regular, NSColor(white: 0.87, alpha: 1))
     guard let image = ctx.makeImage() else { throw SkyError.renderFailed }

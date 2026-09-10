@@ -22,5 +22,5 @@ card('milkyway',('帕拉纳尔的银河','Milky Way over Paranal','파라날의 
 ('银河铺展在智利帕拉纳尔山上空，地平线处是甚大望远镜的剪影。最明亮、被深色条带穿过的区域，对应银河系的中央核球。','The Milky Way stretches above Cerro Paranal in Chile, with the Very Large Telescope silhouetted on the horizon. The brightest area, crossed by dark lanes, corresponds to our galaxy’s central bulge.','칠레 파라날산 위로 은하수가 펼쳐지고, 지평선에는 초거대망원경의 실루엣이 보입니다. 어두운 띠가 가로지르는 가장 밝은 부분은 우리 은하의 중심 팽대부입니다.'),
 ('银河中央附近还有一柱较明亮的黄道光。沿着深色尘埃带寻找结构，可以看见星空中明暗交错的层次。','A brighter column of zodiacal light intersects the central region. Follow the dark dust lanes to explore the alternating bright and dark structures.','밝은 황도광 기둥이 은하 중심부와 교차합니다. 어두운 먼지 띠를 따라가며 밝고 어두운 구조가 이루는 층을 살펴보세요.'),
 ('这是一张地面夜空摄影，保留了天文台所在山脊和前景岩石。拍摄器材与曝光参数未在来源页列出。','This ground-based night photograph includes the observatory’s ridge and foreground rocks. Camera and exposure details are not listed on the source page.','천문대가 있는 산등성이와 앞쪽 바위를 함께 담은 지상 밤하늘 사진입니다. 출처 페이지에는 카메라와 노출 정보가 나와 있지 않습니다.')])]
-(PACK/'catalog.json').write_text(json.dumps(dict(schemaVersion=1,version='1.0.0',cards=cards),ensure_ascii=False,indent=2)+'\n')
+(PACK/'catalog.json').write_text(json.dumps(dict(schemaVersion=1,version='1.1.0',cards=cards),ensure_ascii=False,indent=2)+'\n')
 print('Created trilingual astronomy pack:',len(cards),'cards')
