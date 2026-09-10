@@ -1,0 +1,23 @@
+name: Verify Starfolio
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tests and packaged resource verification
+        run: |
+          ./script/test.sh
+          ./script/build_and_run.sh --verify
+      - name: Render all content languages
+        run: ./script/build_and_run.sh --render-previews
+      - name: Check generated catalog
+        run: |
+          python3 script/seed_content.py
+          git diff --exit-code -- Packages/CelestialKit/Sources/CelestialKit/Resources/astronomy/catalog.json

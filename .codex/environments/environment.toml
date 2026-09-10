@@ -1,0 +1,12 @@
+version = 1
+name = "Starfolio"
+[setup]
+script = ""
+[[actions]]
+name = "Run"
+icon = "run"
+command = "./script/build_and_run.sh"
+[[actions]]
+name = "Preview"
+icon = "run"
+command = "./script/build_and_run.sh --preview"

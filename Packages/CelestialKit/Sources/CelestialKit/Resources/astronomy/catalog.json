@@ -1,0 +1,249 @@
+{
+  "schemaVersion": 1,
+  "version": "1.0.0",
+  "cards": [
+    {
+      "id": "sky-carina",
+      "title": {
+        "zhHans": "宇宙悬崖",
+        "en": "Cosmic Cliffs",
+        "ko": "우주의 절벽"
+      },
+      "subtitle": {
+        "zhHans": "NGC 3324 · 韦伯空间望远镜",
+        "en": "NGC 3324 · James Webb Space Telescope",
+        "ko": "NGC 3324 · 제임스 웹 우주망원경"
+      },
+      "caption": {
+        "zhHans": "年轻恒星的辐射与恒星风，正在雕刻这片气体与尘埃。",
+        "en": "Young stars sculpt these clouds with radiation and stellar winds.",
+        "ko": "젊은 별의 복사와 항성풍이 가스와 먼지 구름을 조각하고 있습니다."
+      },
+      "category": {
+        "zhHans": "星云",
+        "en": "Nebula",
+        "ko": "성운"
+      },
+      "capture": {
+        "zhHans": "近红外 · NIRCam",
+        "en": "Near-infrared · NIRCam",
+        "ko": "근적외선 · NIRCam"
+      },
+      "credit": "NASA, ESA, CSA, and STScI",
+      "sourceURL": "https://esawebb.org/images/weic2205a/",
+      "license": "CC BY 4.0",
+      "licenseURL": "https://esawebb.org/copyright/",
+      "image": "assets/carina.jpg",
+      "sha256": "0c36eb0d1d7ccb097652895e9597cc0678a35148ab494697a387f1a55889230f",
+      "width": 4000,
+      "height": 2317,
+      "fit": false,
+      "sections": [
+        {
+          "id": "1",
+          "title": {
+            "zhHans": "你正在看什么",
+            "en": "What you are seeing",
+            "ko": "무엇을 보고 있나요"
+          },
+          "text": {
+            "zhHans": "这是船底座星云中 NGC 3324 恒星形成区的边缘，距离我们约 7,600 光年。看似山脊的结构，是巨大气体空腔的边界。",
+            "en": "This is the edge of the star-forming region NGC 3324 in the Carina Nebula, about 7,600 light-years away. The apparent ridge marks the boundary of a vast gaseous cavity.",
+            "ko": "약 7,600광년 떨어진 용골자리 성운의 별 탄생 영역 NGC 3324 가장자리입니다. 산등성이처럼 보이는 구조는 거대한 가스 공동의 경계입니다."
+          },
+          "sourceURL": "https://esawebb.org/images/weic2205a/"
+        },
+        {
+          "id": "2",
+          "title": {
+            "zhHans": "留意这些细节",
+            "en": "Look a little closer",
+            "ko": "자세히 살펴보기"
+          },
+          "text": {
+            "zhHans": "高温年轻恒星的辐射和恒星风侵蚀云壁，留下柱状结构。韦伯的近红外相机揭示了此前被尘埃遮蔽的恒星。",
+            "en": "Radiation and winds from hot young stars erode the cloud wall, leaving pillars behind. Webb’s near-infrared camera reveals stars previously hidden by dust.",
+            "ko": "뜨겁고 젊은 별의 복사와 항성풍이 구름 벽을 깎아내며 기둥 모양의 구조를 남깁니다. 웹의 근적외선 카메라는 먼지에 가려져 있던 별들을 드러냅니다."
+          },
+          "sourceURL": "https://esawebb.org/images/weic2205a/"
+        },
+        {
+          "id": "3",
+          "title": {
+            "zhHans": "影像如何形成",
+            "en": "How the image was made",
+            "ko": "이미지는 어떻게 만들어졌나요"
+          },
+          "text": {
+            "zhHans": "不同红外波段被映射为可见颜色，帮助我们辨认肉眼无法直接看到的结构。图像来源于真实观测，颜色用于表达波段信息。",
+            "en": "Different infrared wavelengths are mapped to visible colors, revealing structures our eyes cannot see directly. The image comes from real observations; its colors represent wavelength information.",
+            "ko": "서로 다른 적외선 파장을 눈에 보이는 색으로 표현해 맨눈으로 볼 수 없는 구조를 드러냅니다. 실제 관측 자료로 만든 이미지이며, 색은 파장 정보를 나타냅니다."
+          },
+          "sourceURL": "https://esawebb.org/about/general/image-processing/"
+        }
+      ]
+    },
+    {
+      "id": "sky-saturn",
+      "title": {
+        "zhHans": "土星与它的环",
+        "en": "Saturn & Its Rings",
+        "ko": "토성과 고리"
+      },
+      "subtitle": {
+        "zhHans": "土星 · 卡西尼号探测器",
+        "en": "Saturn · Cassini spacecraft",
+        "ko": "토성 · 카시니 탐사선"
+      },
+      "caption": {
+        "zhHans": "这幅土星肖像，由卡西尼号拍摄的 126 张影像拼接而成。",
+        "en": "A portrait assembled from 126 images captured by Cassini.",
+        "ko": "카시니가 촬영한 이미지 126장을 이어 붙여 만든 토성의 초상입니다."
+      },
+      "category": {
+        "zhHans": "行星",
+        "en": "Planet",
+        "ko": "행성"
+      },
+      "capture": {
+        "zhHans": "可见光 · 自然色合成",
+        "en": "Visible light · Natural-color mosaic",
+        "ko": "가시광선 · 자연색 모자이크"
+      },
+      "credit": "NASA/JPL/Space Science Institute",
+      "sourceURL": "https://science.nasa.gov/resource/the-greatest-saturn-portraityet/",
+      "license": "NASA Media Guidelines",
+      "licenseURL": "https://www.nasa.gov/nasa-brand-center/images-and-media/",
+      "image": "assets/saturn.jpg",
+      "sha256": "3bf33f7d0eba802c4ec8d6c546da9450875ff0a72e74d3f0f9c6f66fe224ead8",
+      "width": 3840,
+      "height": 1962,
+      "fit": true,
+      "sections": [
+        {
+          "id": "1",
+          "title": {
+            "zhHans": "你正在看什么",
+            "en": "What you are seeing",
+            "ko": "무엇을 보고 있나요"
+          },
+          "text": {
+            "zhHans": "2004 年 10 月 6 日，卡西尼号在约 630 万千米外拍摄土星。42 个取景区域各拍红、绿、蓝三幅图像，组成这幅自然色全景。",
+            "en": "On October 6, 2004, Cassini imaged Saturn from about 6.3 million kilometers away. Red, green and blue exposures at each of 42 positions form this natural-color mosaic.",
+            "ko": "2004년 10월 6일, 카시니는 약 630만 킬로미터 거리에서 토성을 촬영했습니다. 42개 영역에서 각각 빨강·초록·파랑 필터로 촬영한 이미지로 자연색 모자이크를 만들었습니다."
+          },
+          "sourceURL": "https://science.nasa.gov/resource/the-greatest-saturn-portraityet/"
+        },
+        {
+          "id": "2",
+          "title": {
+            "zhHans": "留意这些细节",
+            "en": "Look a little closer",
+            "ko": "자세히 살펴보기"
+          },
+          "text": {
+            "zhHans": "观察土星在环上投下的阴影，以及环在行星上留下的阴影。环带之间的细微色差，也保留在这幅影像里。",
+            "en": "Look for the planet’s shadow across its rings, and the rings’ shadows on the planet. Subtle color differences across the rings are also visible.",
+            "ko": "고리 위에 드리운 토성의 그림자와 토성에 비친 고리의 그림자를 찾아보세요. 고리 사이의 미묘한 색 차이도 볼 수 있습니다."
+          },
+          "sourceURL": "https://science.nasa.gov/resource/the-greatest-saturn-portraityet/"
+        },
+        {
+          "id": "3",
+          "title": {
+            "zhHans": "影像如何形成",
+            "en": "How the image was made",
+            "ko": "이미지는 어떻게 만들어졌나요"
+          },
+          "text": {
+            "zhHans": "每个取景区域的红、绿、蓝图像先合成为彩色影像，再拼成完整肖像。这些照片在约两小时内拍摄。",
+            "en": "The red, green and blue exposures at each position were combined into color images, then assembled into the complete portrait. The images were taken over about two hours.",
+            "ko": "각 영역의 빨강·초록·파랑 이미지를 컬러 이미지로 합친 뒤 전체 초상으로 이어 붙였습니다. 촬영에는 약 두 시간이 걸렸습니다."
+          },
+          "sourceURL": "https://science.nasa.gov/resource/the-greatest-saturn-portraityet/"
+        }
+      ]
+    },
+    {
+      "id": "sky-milkyway",
+      "title": {
+        "zhHans": "帕拉纳尔的银河",
+        "en": "Milky Way over Paranal",
+        "ko": "파라날의 은하수"
+      },
+      "subtitle": {
+        "zhHans": "智利 · 帕拉纳尔天文台",
+        "en": "Chile · Paranal Observatory",
+        "ko": "칠레 · 파라날 천문대"
+      },
+      "caption": {
+        "zhHans": "银河明亮的中央区域，被一道道深色尘埃带穿过。",
+        "en": "Dark dust lanes cross the bright central region of our galaxy.",
+        "ko": "어두운 먼지 띠가 우리 은하의 밝은 중심부를 가로지릅니다."
+      },
+      "category": {
+        "zhHans": "地面星空",
+        "en": "Night sky",
+        "ko": "밤하늘"
+      },
+      "capture": {
+        "zhHans": "地面摄影 · 可见光",
+        "en": "Ground-based photography · Visible light",
+        "ko": "지상 사진 · 가시광선"
+      },
+      "credit": "G. Hüdepohl (atacamaphoto.com)/ESO",
+      "sourceURL": "https://www.eso.org/public/images/gerd_huedepohl_7/",
+      "license": "CC BY 4.0",
+      "licenseURL": "https://www.eso.org/public/outreach/copyright/",
+      "image": "assets/milkyway.jpg",
+      "sha256": "204c99a6c07d2aca970cd615df67d09af6851d2e04b3ddb395dbfeba121ec5a4",
+      "width": 4000,
+      "height": 2662,
+      "fit": false,
+      "sections": [
+        {
+          "id": "1",
+          "title": {
+            "zhHans": "你正在看什么",
+            "en": "What you are seeing",
+            "ko": "무엇을 보고 있나요"
+          },
+          "text": {
+            "zhHans": "银河铺展在智利帕拉纳尔山上空，地平线处是甚大望远镜的剪影。最明亮、被深色条带穿过的区域，对应银河系的中央核球。",
+            "en": "The Milky Way stretches above Cerro Paranal in Chile, with the Very Large Telescope silhouetted on the horizon. The brightest area, crossed by dark lanes, corresponds to our galaxy’s central bulge.",
+            "ko": "칠레 파라날산 위로 은하수가 펼쳐지고, 지평선에는 초거대망원경의 실루엣이 보입니다. 어두운 띠가 가로지르는 가장 밝은 부분은 우리 은하의 중심 팽대부입니다."
+          },
+          "sourceURL": "https://www.eso.org/public/images/gerd_huedepohl_7/"
+        },
+        {
+          "id": "2",
+          "title": {
+            "zhHans": "留意这些细节",
+            "en": "Look a little closer",
+            "ko": "자세히 살펴보기"
+          },
+          "text": {
+            "zhHans": "银河中央附近还有一柱较明亮的黄道光。沿着深色尘埃带寻找结构，可以看见星空中明暗交错的层次。",
+            "en": "A brighter column of zodiacal light intersects the central region. Follow the dark dust lanes to explore the alternating bright and dark structures.",
+            "ko": "밝은 황도광 기둥이 은하 중심부와 교차합니다. 어두운 먼지 띠를 따라가며 밝고 어두운 구조가 이루는 층을 살펴보세요."
+          },
+          "sourceURL": "https://www.eso.org/public/images/gerd_huedepohl_7/"
+        },
+        {
+          "id": "3",
+          "title": {
+            "zhHans": "影像如何形成",
+            "en": "How the image was made",
+            "ko": "이미지는 어떻게 만들어졌나요"
+          },
+          "text": {
+            "zhHans": "这是一张地面夜空摄影，保留了天文台所在山脊和前景岩石。拍摄器材与曝光参数未在来源页列出。",
+            "en": "This ground-based night photograph includes the observatory’s ridge and foreground rocks. Camera and exposure details are not listed on the source page.",
+            "ko": "천문대가 있는 산등성이와 앞쪽 바위를 함께 담은 지상 밤하늘 사진입니다. 출처 페이지에는 카메라와 노출 정보가 나와 있지 않습니다."
+          },
+          "sourceURL": "https://www.eso.org/public/images/gerd_huedepohl_7/"
+        }
+      ]
+    }
+  ]
+}
