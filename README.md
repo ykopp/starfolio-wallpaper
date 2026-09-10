@@ -45,7 +45,7 @@ This preview is not Apple-notarized. If macOS blocks it because the developer ca
 
 다운로드 파일은 macOS 15 이상을 사용하는 Apple Silicon Mac용이며, macOS 15에서의 실제 실행은 아직 검증하지 않았습니다. [Releases](https://github.com/ykopp/starfolio-wallpaper/releases)에서 `macOS-arm64.zip`을 받아 압축을 풀고, `Starfolio.app`을 응용 프로그램 폴더로 옮기세요. 기존 버전은 종료한 뒤 교체하세요. 개발 도구는 필요하지 않습니다.
 
-이 미리 보기 버전은 Apple 공증을 받지 않았습니다. 개발자를 확인할 수 없다는 이유로 차단되면, 이 저장소에서 받은 파일인지 확인한 뒤 **시스템 설정 → 개인정보 보호 및 보안 → 확인 없이 열기**에서 실행을 허용하세요. 시스템 전체의 보안 기능을 끌 필요는 없습니다. 손상 또는 악성 소프트웨어 감지 경고는 일반적인 개발자 확인 경고와 구분하고, 다시 다운로드한 뒤에도 문제가 있으면 Issues에 알려 주세요. [Apple 공식 안내](https://support.apple.com/ko-kr/102445)를 참고하세요. 콘텐츠 업데이트 시 번역 언어 다운로드 동의가 필요할 수 있습니다.
+이 미리 보기 버전은 Apple 공증을 받지 않았습니다. 개발자를 확인할 수 없다는 이유로 차단되면, 이 저장소에서 받은 파일인지 확인한 뒤 **시스템 설정 → 개인정보 보호 및 보안 → 그래도 열기**에서 실행을 허용하세요. 시스템 전체의 보안 기능을 끌 필요는 없습니다. 손상 또는 악성 소프트웨어 감지 경고는 일반적인 개발자 확인 경고와 구분하고, 다시 다운로드한 뒤에도 문제가 있으면 Issues에 알려 주세요. [Apple 공식 안내](https://support.apple.com/ko-kr/102445)를 참고하세요. 콘텐츠 업데이트 시 번역 언어 다운로드 동의가 필요할 수 있습니다.
 
 ## Build from source
 
