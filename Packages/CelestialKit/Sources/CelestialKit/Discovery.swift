@@ -200,7 +200,7 @@ public struct SkyDraft: Sendable {
       ("black hole", .init(zhHans: "黑洞", en: "Black holes", ko: "블랙홀")),
     ]
     let category =
-      categories.first { category.localizedCaseInsensitiveContains($0.0) }?.1
+      categories.first { self.category.localizedCaseInsensitiveContains($0.0) }?.1
       ?? SkyText(zhHans: "天文观测", en: "Astronomical observation", ko: "천체 관측")
     let capture = SkyText(
       zhHans: "\(origin) 官方说明摘录 · 本机机器翻译",
