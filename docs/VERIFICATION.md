@@ -37,3 +37,12 @@ The real-desktop diagnostic is opt-in: `dist/Starfolio.app/Contents/MacOS/Starfo
 - Unverified: macOS 15, first language-download consent, long-running physical multi-Space/multi-monitor behavior, large-library performance and complete native Korean editorial review.
 - Existing-user-library copy: all 12 cards validated; downloaded Trifid Chinese title corrected at read time, originals untouched. Shared CelestialKit snapshot checked (12 files); Sightline compatibility suite passed all 31 tests.
 - Ad-hoc signed development preview; no Developer ID signing identity is configured on this machine, so Apple notarization remains pending.
+
+
+## 0.3.1 app update verification — 2026-09-13
+
+- 22 deterministic tests plus one live GitHub app-update test passed. The live content-acquisition test was not repeated.
+- Numeric version selection (0.3.10 > 0.3.2), preview releases, rejection of drafts/untrusted URLs/missing archives, malformed data and offline state checked.
+- Native isolated Settings button reached the completed no-newer-version state against the real GitHub API.
+- Sightline stable manifest and downloadable ZIP were fetched; SHA256 matched 5fe0c1f66a914b11812ab3e59e1bb6e80eab387c58c0ce38f45c09897b133e10. Its live stable remains 3.1.0 build 18, while its local source is 3.2.0 build 20 with unrelated uncommitted changes. Those changes were not published by this task. Its current 38 tests passed.
+- Older Starfolio 0.3.0 must be manually replaced once. This feature checks at normal launch and on demand; it opens GitHub for manual installation, with no automatic replacement or periodic background polling.

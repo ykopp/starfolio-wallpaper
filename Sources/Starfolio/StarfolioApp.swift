@@ -88,6 +88,7 @@ import Translation
   func applicationDidFinishLaunching(_ notification: Notification) {
     NSApp.setActivationPolicy(.regular)
     NSApp.activate(ignoringOtherApps: true)
+    if !Session.model.isolated { Task { await Session.model.appUpdater.check() } }
   }
   func applicationWillTerminate(_ notification: Notification) { Session.cleanup() }
   func windowShouldClose(_ sender: NSWindow) -> Bool {
@@ -416,11 +417,28 @@ struct Preferences: View {
         ).disabled(model.isolated)
       }
       Section {
+        AppUpdateView(updater: model.appUpdater, language: model.language)
         Text(model.text(.version)).foregroundStyle(.secondary)
         Text(model.text(model.status)).font(.caption)
         if model.isolated { Text(model.text(.preview)).font(.caption) }
       }
-    }.formStyle(.grouped).frame(width: 510, height: 450).padding().environment(
+    }.formStyle(.grouped).frame(width: 540, height: 540).padding().environment(
       \.locale, Locale(identifier: model.language.rawValue))
+  }
+}
+
+struct AppUpdateView: View {
+  @ObservedObject var updater: AppUpdating
+  let language: SkyLanguage
+  var body: some View {
+    VStack(alignment: .leading, spacing: 8) {
+      Button(Copy.checkAppUpdate.text(language)) { Task { await updater.check() } }.disabled(
+        updater.checking)
+      Text(updater.state.text(language)).font(.caption)
+      if let url = updater.releaseURL, let version = updater.availableVersion {
+        Link(Copy.downloadAppUpdate.text(language) + " · " + version, destination: url)
+      }
+      Text(Copy.appInstallHint.text(language)).font(.caption).foregroundStyle(.secondary)
+    }
   }
 }

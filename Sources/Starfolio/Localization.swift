@@ -7,6 +7,8 @@ enum Copy: String, CaseIterable {
     applying, applied, failure, preview, noMatches, selected, release, version, login, loginError,
     displays, retry, noDisplay, export, exportDone, browse, loading
   case storage, repairLibrary, repairDone, clearCache, cacheCleared
+  case checkAppUpdate, downloadAppUpdate, appUpdateReady, appChecking, appUpdateFound, appUpToDate,
+    appUpdateFailed, appInstallHint
   case showFavorites
   case favorite, unfavorite, hideImage, restoreHidden, favoritesOnly, framing, original, fit, fill
   case showNew, allImages
@@ -16,6 +18,20 @@ enum Copy: String, CaseIterable {
   func text(_ language: SkyLanguage) -> String {
     let words: (String, String, String) =
       switch self {
+      case .checkAppUpdate: ("检查应用更新", "Check app updates", "앱 업데이트 확인")
+      case .downloadAppUpdate: ("查看并下载新版", "View and download update", "새 버전 확인 및 다운로드")
+      case .appUpdateReady: ("尚未检查应用版本", "App version not checked yet", "아직 앱 버전을 확인하지 않았습니다")
+      case .appChecking: ("正在检查应用版本…", "Checking app version…", "앱 버전 확인 중…")
+      case .appUpdateFound: ("发现可下载的新版本", "A new version is available", "새 버전을 다운로드할 수 있습니다")
+      case .appUpToDate: ("未发现更新的兼容版本", "No newer compatible version found", "더 새로운 호환 버전이 없습니다")
+      case .appUpdateFailed:
+        ("检查失败，请稍后重试", "Could not check. Please retry later.", "확인하지 못했습니다. 나중에 다시 시도해 주세요.")
+      case .appInstallHint:
+        (
+          "包含开发预览；打开 GitHub 下载后手动替换应用，图库保留。",
+          "Includes previews. Download from GitHub and replace the app manually; your library is retained.",
+          "미리보기 버전 포함. GitHub에서 다운로드한 뒤 앱을 교체하세요. 도감은 유지됩니다."
+        )
       case .storage: ("下载内容占用", "Downloaded storage", "다운로드 저장 공간")
       case .repairLibrary:
         ("修复图库索引（保留原文件）", "Repair library index", "도감 색인 복구")
@@ -122,7 +138,10 @@ enum Copy: String, CaseIterable {
       case .selected: ("当前选择", "Selected", "선택됨")
       case .release: ("暂停换图", "Pause rotation", "자동 변경 일시 정지")
       case .version:
-        ("应用 0.3.0 · 天文内容 1.1.0", "App 0.3.0 · Astronomy 1.1.0", "앱 0.3.0 · 천문 콘텐츠 1.1.0")
+        (
+          "应用 \(AppUpdating.version) · 天文内容 1.1.0", "App \(AppUpdating.version) · Astronomy 1.1.0",
+          "앱 \(AppUpdating.version) · 천문 콘텐츠 1.1.0"
+        )
       case .login: ("登录时启动", "Launch at login", "로그인 시 실행")
       case .loginError:
         ("请在系统设置中检查登录项目权限", "Check Login Items in System Settings.", "시스템 설정에서 로그인 항목 권한을 확인하세요.")

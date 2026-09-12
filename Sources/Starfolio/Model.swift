@@ -56,6 +56,7 @@ struct DisplayResult: Identifiable {
 }
 @MainActor final class StarModel: ObservableObject {
   @Published private(set) var catalog: SkyCatalog
+  let appUpdater = AppUpdating()
   let contentUpdater: ContentUpdater
   let defaults: UserDefaults
   let directory: URL

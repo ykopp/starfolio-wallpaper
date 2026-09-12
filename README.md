@@ -34,6 +34,16 @@ A quiet, native macOS wallpaper app for astronomy. Real observations, a little k
 
 **한국어:** **콘텐츠 업데이트**를 누르면 ESA/Webb와 ESA/Hubble의 최근 관측 이미지를 찾아 다운로드하고, 공식 설명을 기기에서 번역해 한 번에 최대 세 개의 콘텐츠를 보관함에 추가합니다. **새 콘텐츠 보기**에서 고른 뒤 배경화면으로 설정하거나 자동 변경을 켤 수 있습니다. 업데이트만으로 현재 배경화면이 바뀌지는 않습니다. 처음에는 macOS가 번역 언어 다운로드 동의를 요청할 수 있습니다. 기계 번역 표시와 원문 출처·이미지 크레딧이 함께 제공됩니다.
 
+## 应用版本更新 / App updates / 앱 업데이트
+
+从 **0.3.1** 起，应用在正常启动时自动检查 GitHub 发布版本，也可在「设置 → 检查应用更新」手动检查。发现带 Apple Silicon 安装包的新版本后，点击「查看并下载新版」打开官方发布页，再退出并手动替换应用；图库和收藏保留。检查包含开发预览版，不会静默下载安装。GitHub 只推送代码不会提示更新，必须发布带有 `Starfolio-版本号-macOS-arm64.zip` 的 Release。
+
+**0.3.0 及更旧版本没有这个入口，需要先手动安装一次 0.3.1。** 图片和知识仍使用独立的「内容更新」。
+
+**English:** Starting with 0.3.1, normal launches check GitHub releases, including previews. Settings also offers **Check app updates**. A newer release with the Apple Silicon ZIP enables a link to the official release page. Download, quit, and replace the app manually; your library and favorites remain. Older versions need one manual upgrade to 0.3.1. Source-code pushes alone do not trigger updates.
+
+**한국어:** 0.3.1부터 앱 실행 시 GitHub의 새 버전을 확인하며, 설정에서도 확인할 수 있습니다. 미리보기 버전도 포함됩니다. Apple Silicon 설치 파일이 있는 새 버전은 공식 다운로드 페이지로 연결됩니다. 다운로드 후 앱을 종료하고 직접 교체하세요. 도감과 즐겨찾기는 유지됩니다. 이전 버전은 먼저 0.3.1을 수동 설치해야 합니다. 코드만 업로드하면 업데이트 알림이 표시되지 않습니다.
+
 ## 安装与首次打开 / Install and open / 설치 및 실행
 
 ### 中文
@@ -102,4 +112,4 @@ See [architecture and editorial workflow](docs/ARCHITECTURE.md) and [verificatio
 
 Images retain their original credits and usage terms. Code licensing does not relicense photographs. See [image notices](Packages/CelestialKit/IMAGE_NOTICES.md) and the credit/source panel in the app. Wallpapers are resized/cropped as needed and may carry text overlays; original packaged photographs are unchanged. This project is not affiliated with or endorsed by NASA, ESA, CSA, STScI or ESO.
 
-The three bundled cards remain available offline. Live updates require network access and supported Apple translation languages; they are user-triggered, with no background schedule or app auto-updater. There may be no new eligible image on a given check. The acquired library has a 512 MB limit and retains existing files on failure. Favorites, hiding and favorites-only rotation are available; cloud sync is not included. Machine translations, especially Korean, still need independent native-speaker editorial review.
+The three bundled cards remain available offline. Live updates require network access and supported Apple translation languages; they are user-triggered, with no background content schedule. App updates are checked separately and installed manually. There may be no new eligible image on a given check. The acquired library has a 512 MB limit and retains existing files on failure. Favorites, hiding and favorites-only rotation are available; cloud sync is not included. Machine translations, especially Korean, still need independent native-speaker editorial review.
