@@ -18,6 +18,7 @@ public struct SkyLibrary: Sendable {
   private struct Index: Codable {
     let version: Int
     let batches: [String]
+    var recoveryOrderUnknown: Bool? = nil
   }
   private var indexURL: URL { root.appendingPathComponent("index.json") }
   private func index() throws -> Index {
@@ -40,26 +41,87 @@ public struct SkyLibrary: Sendable {
     var failed = 0
     var newest: Set<String> = []
     do {
-      for name in try index().batches {
+      let savedIndex = try index()
+      for name in savedIndex.batches {
         do {
           let folder = root.appendingPathComponent("batches/\(name)")
-          let metadata = try Data(contentsOf: folder.appendingPathComponent("catalog.json"))
-          guard metadata.count <= 2_000_000 else { throw SkyError.invalidContent }
-          let pack = try JSONDecoder().decode(SkyCatalog.self, from: metadata).located(at: folder)
-          guard pack.cards.count <= 3 else { throw SkyError.invalidContent }
-          for card in pack.cards {
-            guard
-              pack.imageURL(card).resolvingSymlinksInPath().path.hasPrefix(
-                folder.resolvingSymlinksInPath().path + "/")
-            else { throw SkyError.invalidContent }
-          }
-          try pack.validate(verifyImages: true)
+          let pack = try readBatch(name)
           catalog = catalog.adding(pack, root: folder)
           newest = Set(pack.cards.map(\.id))
         } catch { failed += 1 }
       }
+      if savedIndex.recoveryOrderUnknown == true { newest = [] }
     } catch { failed += 1 }
     return LibraryRead(catalog: catalog, unreadableBatches: failed, newestCardIDs: newest)
+  }
+  private func readBatch(_ name: String) throws -> SkyCatalog {
+    let folder = root.appendingPathComponent("batches/\(name)")
+    let metadata = try Data(contentsOf: folder.appendingPathComponent("catalog.json"))
+    guard metadata.count <= 2_000_000 else { throw SkyError.invalidContent }
+    let pack = try JSONDecoder().decode(SkyCatalog.self, from: metadata).located(at: folder)
+    guard pack.cards.count <= 3 else { throw SkyError.invalidContent }
+    for card in pack.cards {
+      guard
+        pack.imageURL(card).resolvingSymlinksInPath().path.hasPrefix(
+          folder.resolvingSymlinksInPath().path + "/")
+      else { throw SkyError.invalidContent }
+    }
+    try pack.validate(verifyImages: true)
+    return pack
+  }
+  public func storageBytes() throws -> Int {
+    let files = FileManager.default.enumerator(
+      at: root, includingPropertiesForKeys: [.fileSizeKey, .isRegularFileKey])
+    var total = 0
+    while let file = files?.nextObject() as? URL {
+      let values = try file.resourceValues(forKeys: [.fileSizeKey, .isRegularFileKey])
+      if values.isRegularFile == true { total += values.fileSize ?? 0 }
+    }
+    return total
+  }
+  /// Explicit repair backs up the index, excludes damaged batches, and retains all source files.
+  public func repair(onto base: SkyCatalog) throws -> LibraryRead {
+    let fm = FileManager.default
+    let names: [String]
+    let orderUnknown: Bool
+    if fm.fileExists(atPath: indexURL.path), let existing = try? index() {
+      names = existing.batches
+      orderUnknown = existing.recoveryOrderUnknown == true
+    } else {
+      orderUnknown = true
+      names =
+        (try? fm.contentsOfDirectory(atPath: root.appendingPathComponent("batches").path))?.sorted()
+        ?? []
+    }
+    var good: [String] = []
+    var ids = Set(base.cards.map(\.id))
+    var hashes = Set(base.cards.map(\.sha256))
+    for name in names where UUID(uuidString: name) != nil {
+      guard let pack = try? readBatch(name),
+        pack.cards.allSatisfy({ !ids.contains($0.id) && !hashes.contains($0.sha256) })
+      else { continue }
+      good.append(name)
+      ids.formUnion(pack.cards.map(\.id))
+      hashes.formUnion(pack.cards.map(\.sha256))
+    }
+    guard good.count <= 200 else { throw SkyError.invalidContent }
+    try fm.createDirectory(at: root, withIntermediateDirectories: true)
+    if fm.fileExists(atPath: indexURL.path) {
+      try fm.copyItem(
+        at: indexURL, to: root.appendingPathComponent("index-backup-\(UUID().uuidString).json"))
+    }
+    try JSONEncoder().encode(Index(version: 1, batches: good, recoveryOrderUnknown: orderUnknown))
+      .write(to: indexURL, options: .atomic)
+    return read(onto: base)
+  }
+  /// Only transaction preview caches are rebuilt on demand; desktop render files and originals are never evicted.
+  public func clearPreviewCaches() throws {
+    for name in try index().batches {
+      let folder = root.appendingPathComponent("batches/\(name)/previews")
+      if FileManager.default.fileExists(atPath: folder.path) {
+        try FileManager.default.removeItem(at: folder)
+      }
+    }
   }
   public func makeStagingDirectory() throws -> URL {
     let folder = root.appendingPathComponent("staging/\(UUID().uuidString)")

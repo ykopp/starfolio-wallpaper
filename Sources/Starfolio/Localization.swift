@@ -6,6 +6,9 @@ enum Copy: String, CaseIterable {
     search, aboutImage, source, rights, close, quit, open, rotation, off, hourly, daily, ready,
     applying, applied, failure, preview, noMatches, selected, release, version, login, loginError,
     displays, retry, noDisplay, export, exportDone, browse, loading
+  case storage, repairLibrary, repairDone, clearCache, cacheCleared
+  case showFavorites
+  case favorite, unfavorite, hideImage, restoreHidden, favoritesOnly, framing, original, fit, fill
   case showNew, allImages
   case update, updateReady, finding, translating, makingCards, updateDone, updateEmpty,
     updateCancelled, updateFailed, translationFailed, libraryFull, libraryWarning, cancelUpdate,
@@ -13,6 +16,31 @@ enum Copy: String, CaseIterable {
   func text(_ language: SkyLanguage) -> String {
     let words: (String, String, String) =
       switch self {
+      case .storage: ("下载内容占用", "Downloaded storage", "다운로드 저장 공간")
+      case .repairLibrary:
+        ("修复图库索引（保留原文件）", "Repair library index", "도감 색인 복구")
+      case .repairDone:
+        (
+          "索引已修复，无法读取的批次已隔离，原文件与旧索引已保留",
+          "Index repaired. Unreadable batches excluded; originals and old index retained.",
+          "색인이 복구되었습니다. 읽을 수 없는 항목은 제외되며 원본과 이전 색인은 보존됩니다."
+        )
+      case .clearCache: ("清理可重建预览", "Clear rebuildable previews", "재생성 가능한 미리보기 삭제")
+      case .cacheCleared:
+        (
+          "预览缓存已清理，原图与桌面壁纸已保留", "Previews cleared. Originals and desktop wallpapers retained.",
+          "미리보기가 삭제되었습니다. 원본과 바탕화면은 유지됩니다."
+        )
+      case .showFavorites: ("只看收藏", "Show favorites", "즐겨찾기만 보기")
+      case .favorite: ("收藏", "Favorite", "즐겨찾기")
+      case .unfavorite: ("取消收藏", "Unfavorite", "즐겨찾기 해제")
+      case .hideImage: ("隐藏此图", "Hide image", "이미지 숨기기")
+      case .restoreHidden: ("恢复隐藏图片", "Restore hidden images", "숨긴 이미지 복원")
+      case .favoritesOnly: ("仅轮播收藏", "Rotate favorites only", "즐겨찾기만 자동 변경")
+      case .framing: ("画面适配", "Image framing", "이미지 맞춤")
+      case .original: ("推荐构图", "Recommended", "권장")
+      case .fit: ("完整显示", "Fit entire image", "전체 이미지 표시")
+      case .fill: ("铺满屏幕", "Fill screen", "화면 채우기")
       case .showNew: ("查看新增", "View new", "새 콘텐츠 보기")
       case .allImages: ("全部图片", "All images", "모든 이미지")
       case .update: ("内容更新", "Get new content", "콘텐츠 업데이트")
@@ -94,7 +122,7 @@ enum Copy: String, CaseIterable {
       case .selected: ("当前选择", "Selected", "선택됨")
       case .release: ("暂停换图", "Pause rotation", "자동 변경 일시 정지")
       case .version:
-        ("应用 0.2.0 · 天文内容 1.1.0", "App 0.2.0 · Astronomy 1.1.0", "앱 0.2.0 · 천문 콘텐츠 1.1.0")
+        ("应用 0.3.0 · 天文内容 1.1.0", "App 0.3.0 · Astronomy 1.1.0", "앱 0.3.0 · 천문 콘텐츠 1.1.0")
       case .login: ("登录时启动", "Launch at login", "로그인 시 실행")
       case .loginError:
         ("请在系统设置中检查登录项目权限", "Check Login Items in System Settings.", "시스템 설정에서 로그인 항목 권한을 확인하세요.")

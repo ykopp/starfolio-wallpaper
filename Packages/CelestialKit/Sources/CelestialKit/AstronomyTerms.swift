@@ -18,6 +18,11 @@ public enum AstronomyTerms {
       {
         result = result.replacingOccurrences(of: "银河系", with: "星系")
       }
+      if english.contains("trifid") {
+        for term in ["三叉戍星云", "三角星云", "三叉星云"] {
+          result = result.replacingOccurrences(of: term, with: "三裂星云")
+        }
+      }
       if english.contains("superbubble") {
         for term in ["超级泡沫", "超级气泡", "超级泡泡"] {
           result = result.replacingOccurrences(of: term, with: "超泡")
@@ -35,5 +40,27 @@ public enum AstronomyTerms {
       result = result.replacingOccurrences(of: "대형 마젤란 구름", with: "대마젤란 은하")
     }
     return result
+  }
+}
+
+extension SkyText {
+  var corrected: SkyText {
+    .init(
+      zhHans: AstronomyTerms.normalize(zhHans, source: en, language: .chinese), en: en,
+      ko: AstronomyTerms.normalize(ko, source: en, language: .korean))
+  }
+}
+extension SkyCard {
+  /// Read-time revisions retain original downloaded metadata and image identity.
+  var corrected: SkyCard {
+    SkyCard(
+      id: id, title: title.corrected, subtitle: subtitle.corrected,
+      caption: caption.corrected, category: category, capture: capture,
+      credit: credit, sourceURL: sourceURL, license: license, licenseURL: licenseURL,
+      image: image, sha256: sha256, width: width, height: height, fit: fit,
+      sections: sections.map {
+        SkySection(
+          id: $0.id, title: $0.title.corrected, text: $0.text.corrected, sourceURL: $0.sourceURL)
+      })
   }
 }

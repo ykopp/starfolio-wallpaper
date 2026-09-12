@@ -26,3 +26,14 @@ Verified on an Apple Silicon Mac with Swift 6.4 and the installed stable SDK com
 This is a development preview, not an Apple-notarized distribution. Intel and macOS 15 runtime execution, login-item registration, long-duration rotation, and every multi-Space/sleep/reconnect scenario have not been manually exercised. Automated tests cover timer selection and partial-failure behavior. Korean copy has not had an independent native-speaker review. Live content acquisition is manual, through Content update; no background schedule or app update service is included.
 
 The real-desktop diagnostic is opt-in: `dist/Starfolio.app/Contents/MacOS/Starfolio --smoke-desktop`. It briefly changes connected desktops and restores their previous URLs and options; normal verification and preview never write the desktop.
+
+
+## 0.3.0 verification — 2026-09-12
+
+- 20 deterministic tests executed and passed; one separately enabled live test downloaded three official observations, translated Chinese/Korean, rendered and committed successfully.
+- New regression coverage: stale delayed reapply, rotation deadline preservation, cancellation during availability and during pending session followed by restart, restrictive credits, independent favorites rotation, hidden exclusions, missing/corrupt index recovery, safe preview clearing, framing cache identity.
+- Two independent review lanes: code APPROVE, architecture CLEAR after repairing missing-index recovery, suppressing unknown recovered newest order and caching storage totals.
+- Native isolated UI: favorite and favorites filter verified; full-image framing inspected; Chinese, English and Korean layouts inspected. No real desktop changes were made.
+- Unverified: macOS 15, first language-download consent, long-running physical multi-Space/multi-monitor behavior, large-library performance and complete native Korean editorial review.
+- Existing-user-library copy: all 12 cards validated; downloaded Trifid Chinese title corrected at read time, originals untouched. Shared CelestialKit snapshot checked (12 files); Sightline compatibility suite passed all 31 tests.
+- Ad-hoc signed development preview; no Developer ID signing identity is configured on this machine, so Apple notarization remains pending.

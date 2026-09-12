@@ -12,6 +12,18 @@ A quiet, native macOS wallpaper app for astronomy. Real observations, a little k
 
 **한국어:** 중국어·영어·한국어 인터페이스와 설명을 제공하는 독립형 macOS 천문 배경화면 앱입니다. 우주의 절벽, 토성과 고리, 파라날의 은하수 등 세 가지 엄선된 이미지를 오프라인으로 감상할 수 있습니다. 검색, 이미지 전용 모드와 짧은 설명 모드, 배경화면 설정, PNG 내보내기, 시간별·일별 자동 변경, 로그인 시 실행을 지원합니다. 이미지를 둘러보는 것만으로는 배경화면이 바뀌지 않습니다.
 
+## 0.3.0 日常使用完善 / Library controls / 도감 관리
+
+**中文：** 新增收藏、只看收藏、隐藏和恢复隐藏图片；设置中可选择「仅轮播收藏」。没有可用收藏时暂停换图，不会改用其他图片。浏览位置与轮播独立。可选择推荐构图、完整显示或铺满屏幕，预览、导出和桌面设置一致。
+
+「下载内容占用」中可清理可重建的批次预览，或修复图库索引。修复会保留旧索引备份及所有原文件，排除无法读取的批次；原图损坏时不能凭索引修复重建原图。清理不会删除桌面壁纸或原图。修复后可再次尝试内容更新。若恢复时无法确认批次顺序，不显示「查看新增」，下一次成功更新后恢复显示。
+
+已下载卡片也会应用已确认的术语纠错，例如 Trifid Nebula 的中文误译修正为「三裂星云」；原始下载文案仍保留。新卡按来源类别归类。此规则不是对全部翻译的人工审校，也不会自动重译全部旧卡。
+
+**English:** Favorite, filter and hide images; restore hidden images in Settings. Favorites-only rotation pauses when no eligible favorites remain. Browsing does not move the rotation cursor. Choose recommended framing, fit or fill for preview, export and desktop. Downloaded storage offers preview-cache cleanup and index repair, preserving original images and desktop renders. Repair excludes unreadable batches and backs up the old index; it cannot reconstruct damaged photographs. Known terminology corrections also apply to existing cards without rewriting downloaded originals.
+
+**한국어:** 즐겨찾기, 즐겨찾기 필터, 이미지 숨기기와 설정에서 복원을 지원합니다. 즐겨찾기만 자동 변경할 때 해당 이미지가 없으면 변경을 일시 중지합니다. 탐색 위치와 자동 변경 순서는 독립적입니다. 권장·전체 표시·화면 채우기를 선택할 수 있습니다. 다운로드 저장 공간에서 미리보기 캐시 삭제와 색인 복구가 가능합니다. 원본과 바탕화면 파일은 유지되며, 복구 전에 이전 색인을 보관합니다. 손상된 원본 사진을 복원하는 기능은 아닙니다. 기존 카드에도 확인된 용어 교정이 적용되지만 전체 번역을 교정한 것은 아닙니다.
+
 ## 点击「内容更新」会发生什么
 
 应用会从 ESA/Webb 与 ESA/Hubble 官方近期图片中筛选真实天文观测，下载图片和说明，选取完整原文段落，使用 Apple 本机翻译制作中英韩内容，再生成壁纸并加入本机图库。每次最多新增 3 张；重复图片会跳过。使用「查看新增」挑选，再设置壁纸或开启每小时／每日轮播。更新不会改变当前选图或立即替换桌面。
@@ -90,4 +102,4 @@ See [architecture and editorial workflow](docs/ARCHITECTURE.md) and [verificatio
 
 Images retain their original credits and usage terms. Code licensing does not relicense photographs. See [image notices](Packages/CelestialKit/IMAGE_NOTICES.md) and the credit/source panel in the app. Wallpapers are resized/cropped as needed and may carry text overlays; original packaged photographs are unchanged. This project is not affiliated with or endorsed by NASA, ESA, CSA, STScI or ESO.
 
-The three bundled cards remain available offline. Live updates require network access and supported Apple translation languages; they are user-triggered, with no background schedule or app auto-updater. There may be no new eligible image on a given check. The acquired library has a 512 MB limit and retains existing files on failure. Favorites and cloud sync are not included. Machine translations, especially Korean, still need independent native-speaker editorial review.
+The three bundled cards remain available offline. Live updates require network access and supported Apple translation languages; they are user-triggered, with no background schedule or app auto-updater. There may be no new eligible image on a given check. The acquired library has a 512 MB limit and retains existing files on failure. Favorites, hiding and favorites-only rotation are available; cloud sync is not included. Machine translations, especially Korean, still need independent native-speaker editorial review.

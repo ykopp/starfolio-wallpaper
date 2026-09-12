@@ -190,7 +190,18 @@ public struct SkyDraft: Sendable {
           zhHans: "观测笔记 \(index+1)", en: "Observation notes \(index+1)", ko: "관측 노트 \(index+1)"),
         text: text(index + 2), sourceURL: item.link)
     }
-    let category = SkyText(zhHans: "天文观测", en: "Astronomical observation", ko: "천체 관측")
+    let categories: [(String, SkyText)] = [
+      ("nebula", .init(zhHans: "星云", en: "Nebulae", ko: "성운")),
+      ("galax", .init(zhHans: "星系", en: "Galaxies", ko: "은하")),
+      ("cluster", .init(zhHans: "星团", en: "Star clusters", ko: "성단")),
+      ("exoplanet", .init(zhHans: "系外行星", en: "Exoplanets", ko: "외계 행성")),
+      ("solar system", .init(zhHans: "太阳系", en: "Solar system", ko: "태양계")),
+      ("star", .init(zhHans: "恒星", en: "Stars", ko: "별")),
+      ("black hole", .init(zhHans: "黑洞", en: "Black holes", ko: "블랙홀")),
+    ]
+    let category =
+      categories.first { category.localizedCaseInsensitiveContains($0.0) }?.1
+      ?? SkyText(zhHans: "天文观测", en: "Astronomical observation", ko: "천체 관측")
     let capture = SkyText(
       zhHans: "\(origin) 官方说明摘录 · 本机机器翻译",
       en: "\(origin) source excerpts · On-device machine translation",
@@ -310,9 +321,10 @@ public struct SkyDiscovery: Sendable {
       ).first
     else { return nil }
     let credit = SourceHTML.plain(creditHTML)
+    let rightsText = SourceHTML.plain(item.html + " " + page + " " + credit)
+    let restrictions = ["all rights reserved", "permission required", "permission is required"]
     guard !credit.isEmpty, credit.count <= 350,
-      !item.html.localizedCaseInsensitiveContains("all rights reserved"),
-      !credit.localizedCaseInsensitiveContains("permission required")
+      !restrictions.contains(where: { rightsText.localizedCaseInsensitiveContains($0) })
     else { return nil }
     let paragraphs = SourceHTML.matches("<p[^>]*>(.*?)</p>", in: item.html).map(SourceHTML.plain)
       .filter {

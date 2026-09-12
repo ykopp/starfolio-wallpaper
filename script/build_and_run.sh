@@ -16,7 +16,7 @@ python3 - "$APP" <<'PY'
 from pathlib import Path
 import plistlib,sys
 app=Path(sys.argv[1])
-p=dict(CFBundleExecutable='Starfolio',CFBundleIdentifier='com.starfolio.wallpaper',CFBundleName='Starfolio',CFBundleIconFile='AppIcon',LSMultipleInstancesProhibited=True,CFBundleDisplayName='Starfolio',CFBundlePackageType='APPL',CFBundleShortVersionString='0.2.0',CFBundleVersion='2',LSMinimumSystemVersion='15.0',NSPrincipalClass='NSApplication',CFBundleDevelopmentRegion='en',CFBundleLocalizations=['en','zh-Hans','ko'],NSHumanReadableCopyright='Starfolio. Image credits are included in the application.')
+p=dict(CFBundleExecutable='Starfolio',CFBundleIdentifier='com.starfolio.wallpaper',CFBundleName='Starfolio',CFBundleIconFile='AppIcon',LSMultipleInstancesProhibited=True,CFBundleDisplayName='Starfolio',CFBundlePackageType='APPL',CFBundleShortVersionString='0.3.0',CFBundleVersion='3',LSMinimumSystemVersion='15.0',NSPrincipalClass='NSApplication',CFBundleDevelopmentRegion='en',CFBundleLocalizations=['en','zh-Hans','ko'],NSHumanReadableCopyright='Starfolio. Image credits are included in the application.')
 (app/'Contents/Info.plist').write_bytes(plistlib.dumps(p))
 for lang,name in [('en','Starfolio'),('zh-Hans','星笺'),('ko','스타폴리오')]:
  d=app/'Contents/Resources'/f'{lang}.lproj';d.mkdir(exist_ok=True);(d/'InfoPlist.strings').write_text(f'"CFBundleDisplayName" = "{name}";\n')

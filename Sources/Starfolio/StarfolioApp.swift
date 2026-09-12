@@ -176,9 +176,11 @@ struct MainView: View {
   @State private var reading = false
   @State private var search = ""
   @State private var onlyNew = false
+  @State private var onlyFavorites = false
   private var visibleCards: [SkyCard] {
-    model.catalog.cards.filter {
+    model.availableCards.filter {
       $0.matches(search) && (!onlyNew || updates.addedIDs.contains($0.id))
+        && (!onlyFavorites || model.favorites.contains($0.id))
     }
   }
   var body: some View {
@@ -215,7 +217,13 @@ struct MainView: View {
           }
         }
 
+        DisclosureGroup(model.text(.storage)) {
+          Text(updates.storageDescription).font(.caption)
+          Button(model.text(.clearCache)) { updates.clearPreviewCaches() }.disabled(updates.running)
+          Button(model.text(.repairLibrary)) { updates.repairLibrary() }.disabled(updates.running)
+        }.font(.caption)
         TextField(model.text(.search), text: $search).textFieldStyle(.roundedBorder)
+        Toggle(model.text(.showFavorites), isOn: $onlyFavorites).font(.caption)
         ScrollView {
           LazyVStack(spacing: 12) {
             ForEach(visibleCards) { card in
@@ -292,6 +300,19 @@ struct MainView: View {
           Button(model.text(.apply)) { Task { await model.applySelected() } }.buttonStyle(
             .borderedProminent
           ).tint(Color(red: 0.57, green: 0.67, blue: 0.79)).disabled(model.busy)
+        }
+        HStack {
+          Button(model.text(model.favorites.contains(model.selectedID) ? .unfavorite : .favorite)) {
+            model.toggleFavorite()
+          }
+          Button(model.text(.hideImage)) { model.hideSelected() }.disabled(
+            model.availableCards.count <= 1)
+          Spacer()
+          Picker(model.text(.framing), selection: $model.framing) {
+            Text(model.text(.original)).tag(SkyFraming.original)
+            Text(model.text(.fit)).tag(SkyFraming.fit)
+            Text(model.text(.fill)).tag(SkyFraming.fill)
+          }.frame(maxWidth: 300)
         }
         HStack(alignment: .top) {
           VStack(alignment: .leading, spacing: 5) {
@@ -386,6 +407,9 @@ struct Preferences: View {
           Text(model.text(.hourly)).tag(3600)
           Text(model.text(.daily)).tag(86400)
         }
+        Toggle(model.text(.favoritesOnly), isOn: $model.favoritesOnly)
+        Button(model.text(.restoreHidden) + " · \(model.hidden.count)") { model.restoreHidden() }
+          .disabled(model.hidden.isEmpty)
         Toggle(
           model.text(.login),
           isOn: Binding(get: { model.loginEnabled }, set: { model.setLogin($0) })
@@ -396,7 +420,7 @@ struct Preferences: View {
         Text(model.text(model.status)).font(.caption)
         if model.isolated { Text(model.text(.preview)).font(.caption) }
       }
-    }.formStyle(.grouped).frame(width: 510, height: 350).padding().environment(
+    }.formStyle(.grouped).frame(width: 510, height: 450).padding().environment(
       \.locale, Locale(identifier: model.language.rawValue))
   }
 }

@@ -33,3 +33,12 @@ This version renders on the main actor, which can briefly pause the interface on
 Every new card is rendered in three languages before publication. An immutable batch folder contains the images, catalog, previews and provenance. `SkyLibrary` validates image hashes and trilingual fields, checks a 512 MB acquired-library limit, moves staging into a new UUID batch, and then atomically replaces the index. Existing data is not overwritten or evicted. A failed/cancelled update leaves the visible catalog and selected wallpaper intact. Invalid stored batches are reported and skipped on read; they are retained for recovery. Unreferenced files after a crash may remain on disk and count toward the quota.
 
 The model reloads the local library before restoring the selected ID. Adding cards changes the catalog only, so manual selection, application and existing hourly/daily rotation work with the new cards. Rotation defaults to off. A running rotation can select an added card at a later tick. The newest successful batch is available via View new after relaunch. Thumbnails are downsampled and displayed in a lazy list; wallpaper output names include content fingerprints.
+
+
+## Library controls and recovery (0.3)
+
+Favorites and hidden IDs are per-app preferences. The rotation cursor follows the requested/applied wallpaper, never the browsing selection. Hidden cards are excluded and an empty favorites-only pool does not fall back to all cards. Reapply requests preserve the rotation anchor; successful manual/rotation requests advance it. Delayed system events resolve the latest desired ID and explicit requests cancel delayed work.
+
+Index repair is explicit, preserves batch folders, and backs up the existing index before atomic replacement. Missing or corrupt indexes are reconstructed from validated UUID batches. A valid index only repairs its referenced batches, so previously excluded folders are not automatically reintroduced. Unknown recovered order suppresses the newest badge until another successful commit. Preview cleanup only removes indexed batches' `previews` folders; source assets and desktop render paths are never evicted. Storage totals refresh after mutations instead of every view render.
+
+Known source-conditioned terminology corrections apply when merging downloaded cards. Downloaded JSON stays unchanged. Framing and corrected card content both participate in immutable renderer cache identity. The optional framing API preserves compatibility with Sightline's existing call sites.

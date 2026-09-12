@@ -71,8 +71,9 @@ private struct FixtureHTTP: SkyFetching {
     #expect(desktop.applied.isEmpty)
     reopened.rotation = 3600
     reopened.step(-1)
+    let browsing = reopened.selectedID
     await reopened.rotationTick()
-    #expect(reopened.selectedID == card.id)
+    #expect(reopened.selectedID == browsing)
     #expect(desktop.applied.count == 2)
   }
   @Test func incompleteTranslationCannotPublishHalfACard() async throws {

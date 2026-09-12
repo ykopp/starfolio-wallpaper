@@ -2,15 +2,17 @@ import AppKit
 import ImageIO
 
 public enum SkyWallpaperMode: String, Codable, CaseIterable, Sendable { case knowledge, pure }
+public enum SkyFraming: String, Codable, CaseIterable, Sendable { case original, fit, fill }
 @MainActor public enum SkyRenderer {
   public static let version = 2
   public static func render(
     card: SkyCard, imageURL: URL, size: CGSize, language: SkyLanguage, mode: SkyWallpaperMode,
-    directory: URL
+    directory: URL, framing: SkyFraming = .original
   ) throws -> URL {
     guard size.width.isFinite, size.height.isFinite, size.width >= 100, size.height >= 100,
       size.width <= 10000, size.height <= 10000, size.width * size.height <= 50_000_000
     else { throw SkyError.invalidSize }
+    let fit = framing == .original ? card.fit : framing == .fit
     let w = Int(size.width)
     let h = Int(size.height)
     let encoder = JSONEncoder()
@@ -18,7 +20,8 @@ public enum SkyWallpaperMode: String, Codable, CaseIterable, Sendable { case kno
     let identity = try encoder.encode(card)
     let key = String(SkyCatalog.hash(identity).prefix(16))
     let url = directory.appendingPathComponent(
-      "\(card.id)-\(w)x\(h)-\(language.rawValue)-\(mode.rawValue)-v\(version)-\(key).png")
+      "\(card.id)-\(w)x\(h)-\(language.rawValue)-\(mode.rawValue)-\(framing.rawValue)-v\(version)-\(key).png"
+    )
     try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
     if FileManager.default.fileExists(atPath: url.path) {
       guard let src = CGImageSourceCreateWithURL(url as CFURL, nil),
@@ -41,11 +44,11 @@ public enum SkyWallpaperMode: String, Codable, CaseIterable, Sendable { case kno
     ctx.setFillColor(NSColor.black.cgColor)
     ctx.fill(canvas)
     let field =
-      card.fit && mode == .knowledge
+      fit && mode == .knowledge
       ? CGRect(x: width * 0.02, y: height * 0.22, width: width * 0.96, height: height * 0.78)
       : canvas
     let scale =
-      card.fit
+      fit
       ? min(field.width / CGFloat(photo.width), field.height / CGFloat(photo.height))
       : max(field.width / CGFloat(photo.width), field.height / CGFloat(photo.height))
     let pw = CGFloat(photo.width) * scale
@@ -56,7 +59,7 @@ public enum SkyWallpaperMode: String, Codable, CaseIterable, Sendable { case kno
     ctx.draw(
       photo, in: CGRect(x: field.midX - pw / 2, y: field.midY - ph / 2, width: pw, height: ph))
     ctx.restoreGState()
-    if mode == .knowledge && !card.fit {
+    if mode == .knowledge && !fit {
       let colors =
         [
           NSColor.black.withAlphaComponent(0.77).cgColor,

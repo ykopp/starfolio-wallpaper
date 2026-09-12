@@ -32,6 +32,8 @@ enum AppleContentTranslation {
   var onCatalog: ((SkyCatalog) -> Void)?
   let library: SkyLibrary
   private let translateOverride: (@MainActor ([String], SkyLanguage) async throws -> [String])?
+  private let availability:
+    @MainActor (Locale.Language, Locale.Language) async -> LanguageAvailability.Status
   private let base: SkyCatalog
   private let discover: @Sendable (SkyCatalog) async throws -> DiscoveryBatch
   private var work: Task<Void, Never>?
@@ -43,8 +45,14 @@ enum AppleContentTranslation {
   init(
     base: SkyCatalog, root: URL,
     discover: (@Sendable (SkyCatalog) async throws -> DiscoveryBatch)? = nil,
-    translation: (@MainActor ([String], SkyLanguage) async throws -> [String])? = nil
+    translation: (@MainActor ([String], SkyLanguage) async throws -> [String])? = nil,
+    availability:
+      @escaping @MainActor (Locale.Language, Locale.Language) async -> LanguageAvailability.Status =
+      { source, target in
+        await LanguageAvailability().status(from: source, to: target)
+      }
   ) {
+    self.availability = availability
     self.translateOverride = translation
     self.base = base
     self.library = SkyLibrary(root: root)
@@ -54,6 +62,34 @@ enum AppleContentTranslation {
     self.warnings = loaded.unreadableBatches
     self.discover = discover ?? { try await SkyDiscovery().discover(excluding: $0) }
     if loaded.unreadableBatches > 0 { state = .libraryWarning }
+    refreshStorage()
+  }
+  @Published private(set) var storageBytes = 0
+  private func refreshStorage() { storageBytes = (try? library.storageBytes()) ?? 0 }
+  var storageDescription: String {
+    let bytes = storageBytes
+    return ByteCountFormatter.string(fromByteCount: Int64(bytes), countStyle: .file) + " / "
+      + ByteCountFormatter.string(fromByteCount: Int64(library.byteLimit), countStyle: .file)
+  }
+  func repairLibrary() {
+    guard !running else { return }
+    do {
+      let restored = try library.repair(onto: base)
+      catalog = restored.catalog
+      warnings = restored.unreadableBatches
+      addedIDs = restored.newestCardIDs
+      refreshStorage()
+      state = .repairDone
+      onCatalog?(catalog)
+    } catch { state = .updateFailed }
+  }
+  func clearPreviewCaches() {
+    guard !running else { return }
+    do {
+      try library.clearPreviewCaches()
+      refreshStorage()
+      state = .cacheCleared
+    } catch { state = .updateFailed }
   }
   func start() {
     guard !running else { return }
@@ -91,6 +127,7 @@ enum AppleContentTranslation {
     var staging: URL?
     defer {
       if let staging { try? FileManager.default.removeItem(at: staging) }
+      refreshStorage()
       if job == id {
         running = false
         configuration = nil
@@ -170,7 +207,8 @@ enum AppleContentTranslation {
     if let translateOverride { return try await translateOverride(strings, language) }
     let source = Locale.Language(identifier: "en")
     let target = Locale.Language(identifier: language.rawValue)
-    let availability = await LanguageAvailability().status(from: source, to: target)
+    let availability = await availability(source, target)
+    try check(id)
     guard availability != .unsupported else { throw DiscoveryError.translation }
     if #available(macOS 26, *), availability == .installed,
       !CommandLine.arguments.contains("--view-translation")

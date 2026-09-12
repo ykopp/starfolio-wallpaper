@@ -92,7 +92,7 @@ public struct SkyCatalog: Codable, Sendable {
     var result = self
     let known = Set(cards.map(\.id))
     for card in addition.cards where !known.contains(card.id) {
-      result.cards.append(card)
+      result.cards.append(card.corrected)
       result.imageRoots[card.id] = root
     }
     return result

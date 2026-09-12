@@ -89,6 +89,46 @@ struct DisplayResult: Identifiable {
       configureTimer()
     }
   }
+  @Published var favorites: Set<String> {
+    didSet { defaults.set(Array(favorites), forKey: "favorites") }
+  }
+  @Published var hidden: Set<String> { didSet { defaults.set(Array(hidden), forKey: "hidden") } }
+  @Published var favoritesOnly: Bool {
+    didSet {
+      defaults.set(favoritesOnly, forKey: "favoritesOnly")
+      clearPendingRotation()
+    }
+  }
+  @Published var framing: SkyFraming {
+    didSet {
+      defaults.set(framing.rawValue, forKey: "framing")
+      refreshPreview()
+      reapplyIfActive()
+    }
+  }
+  var availableCards: [SkyCard] { catalog.cards.filter { !hidden.contains($0.id) } }
+  var rotationCards: [SkyCard] {
+    availableCards.filter { !favoritesOnly || favorites.contains($0.id) }
+  }
+  func toggleFavorite() {
+    if favorites.contains(selectedID) {
+      favorites.remove(selectedID)
+    } else {
+      favorites.insert(selectedID)
+    }
+    clearPendingRotation()
+  }
+  func hideSelected() {
+    guard availableCards.count > 1 else { return }
+    hidden.insert(selectedID)
+    selectedID = availableCards[0].id
+    clearPendingRotation()
+  }
+  func restoreHidden() { hidden = [] }
+  private func clearPendingRotation() {
+    pendingRotationID = nil
+    defaults.removeObject(forKey: "pendingRotationID")
+  }
   @Published private(set) var previewURL: URL?
   @Published private(set) var status: Copy = .ready
   @Published private(set) var busy = false
@@ -102,7 +142,11 @@ struct DisplayResult: Identifiable {
   private var appliedID: String?
   private var desiredID: String?
   private var pendingRotationID: String?
-  private var requestedApply: String?
+  private struct ApplyRequest {
+    let id: String
+    let advancesRotation: Bool
+  }
+  private var requestedApply: ApplyRequest?
   private var previewGeneration = 0
   private var stopped = false
   var language: SkyLanguage { SkyLanguage(rawValue: languageChoice) ?? SkyLanguage.preferred() }
@@ -138,6 +182,10 @@ struct DisplayResult: Identifiable {
       ?? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
       .appendingPathComponent("Starfolio/rendered")
     self.desktop = desktop ?? (isolated ? PreviewDesktop() : MacDesktop())
+    favorites = Set(defaults.stringArray(forKey: "favorites") ?? [])
+    hidden = Set(defaults.stringArray(forKey: "hidden") ?? [])
+    favoritesOnly = defaults.bool(forKey: "favoritesOnly")
+    framing = SkyFraming(rawValue: defaults.string(forKey: "framing") ?? "") ?? .original
     selectedID =
       defaults.string(forKey: "selection").flatMap { id in
         catalog.cards.contains { $0.id == id } ? id : nil
@@ -153,9 +201,17 @@ struct DisplayResult: Identifiable {
     desiredID = defaults.string(forKey: "desiredID") ?? appliedID
     pendingRotationID = defaults.string(forKey: "pendingRotationID")
     updates.onCatalog = { [weak self] updated in
-      self?.catalog = updated
+      guard let self else { return }
+      self.catalog = updated
+      if self.availableCards.isEmpty { self.hidden = [] }
+      if !updated.cards.contains(where: { $0.id == self.selectedID }) {
+        self.selectedID = self.availableCards[0].id
+      }
+      self.refreshPreview()
       // Adding cards never changes selection, desktop, or the rotation schedule.
     }
+    if availableCards.isEmpty { hidden = [] }
+    if hidden.contains(selectedID) { selectedID = availableCards[0].id }
     refreshPreview()
     configureTimer()
     if !isolated {
@@ -173,8 +229,10 @@ struct DisplayResult: Identifiable {
     }
   }
   func step(_ direction: Int) {
-    let i = catalog.cards.firstIndex { $0.id == selectedID } ?? 0
-    selectedID = catalog.cards[(i + direction + catalog.cards.count) % catalog.cards.count].id
+    let cards = availableCards
+    guard !cards.isEmpty else { return }
+    let i = cards.firstIndex { $0.id == selectedID } ?? 0
+    selectedID = cards[(i + direction + cards.count) % cards.count].id
   }
   func refreshPreview() {
     previewTask?.cancel()
@@ -183,6 +241,7 @@ struct DisplayResult: Identifiable {
     let card = selected
     let lang = language
     let mode = mode
+    let framing = framing
     let dir = directory.appendingPathComponent("previews")
     let image = catalog.imageURL(selected)
     previewURL = nil
@@ -192,7 +251,7 @@ struct DisplayResult: Identifiable {
       do {
         let url = try SkyRenderer.render(
           card: card, imageURL: image, size: CGSize(width: 1470, height: 956), language: lang,
-          mode: mode, directory: dir)
+          mode: mode, directory: dir, framing: framing)
         guard let self, !Task.isCancelled, generation == self.previewGeneration else { return }
         self.previewURL = url
       } catch { if let self, generation == self.previewGeneration { self.status = .failure } }
@@ -200,7 +259,7 @@ struct DisplayResult: Identifiable {
   }
   private func reapplyIfActive() {
     if let desiredID {
-      requestedApply = desiredID
+      requestedApply = ApplyRequest(id: desiredID, advancesRotation: false)
       Task { await drain() }
     }
   }
@@ -210,16 +269,18 @@ struct DisplayResult: Identifiable {
     await request(selectedID)
   }
   private func request(_ id: String) async {
+    delayed?.cancel()
     desiredID = id
     defaults.set(id, forKey: "desiredID")
-    requestedApply = id
+    requestedApply = ApplyRequest(id: id, advancesRotation: true)
     await drain()
   }
   private func drain() async {
     guard !busy, !stopped else { return }
     busy = true
     defer { busy = false }
-    while let id = requestedApply {
+    while let request = requestedApply, !stopped {
+      let id = request.id
       requestedApply = nil
       guard let card = catalog.cards.first(where: { $0.id == id }) else { continue }
       let targets = desktop.screens
@@ -235,7 +296,7 @@ struct DisplayResult: Identifiable {
         do {
           let url = try SkyRenderer.render(
             card: card, imageURL: catalog.imageURL(card), size: target.size, language: lang,
-            mode: currentMode, directory: directory)
+            mode: currentMode, directory: directory, framing: framing)
           // Render files are immutable and retained after use, including across disconnected displays and Spaces.
           try await desktop.apply(url, to: target)
           results.append(DisplayResult(id: target.id, name: target.name, succeeded: true))
@@ -243,6 +304,7 @@ struct DisplayResult: Identifiable {
           results.append(DisplayResult(id: target.id, name: target.name, succeeded: false))
         }
       }
+      guard !stopped else { return }
       displayResults = results
       if results.contains(where: { $0.succeeded }) {
         appliedID = id
@@ -250,7 +312,9 @@ struct DisplayResult: Identifiable {
       }
       if results.allSatisfy(\.succeeded) {
         status = .applied
-        defaults.set(Date().timeIntervalSince1970, forKey: "lastRotation")
+        if request.advancesRotation || pendingRotationID == id {
+          defaults.set(Date().timeIntervalSince1970, forKey: "lastRotation")
+        }
         if pendingRotationID == id {
           pendingRotationID = nil
           defaults.removeObject(forKey: "pendingRotationID")
@@ -276,21 +340,29 @@ struct DisplayResult: Identifiable {
     guard rotation > 0, !busy else { return }
     let last = defaults.double(forKey: "lastRotation")
     if now.timeIntervalSince1970 - last >= Double(rotation) {
+      let cards = rotationCards
+      guard !cards.isEmpty else { return }
+      if let pendingRotationID, !cards.contains(where: { $0.id == pendingRotationID }) {
+        clearPendingRotation()
+      }
       if pendingRotationID == nil {
-        step(1)
-        pendingRotationID = selectedID
-        defaults.set(selectedID, forKey: "pendingRotationID")
+        let cursor = cards.firstIndex { $0.id == (desiredID ?? appliedID) }
+        let next = cards[((cursor ?? -1) + 1) % cards.count].id
+        pendingRotationID = next
+        defaults.set(next, forKey: "pendingRotationID")
       }
       if let pendingRotationID { await request(pendingRotationID) }
     }
   }
-  private func scheduleReapply() {
+  func scheduleReapply() {
     delayed?.cancel()
-    guard let desiredID else { return }
+    guard desiredID != nil else { return }
     delayed = Task { [weak self] in
       try? await Task.sleep(for: .milliseconds(650))
-      guard !Task.isCancelled, let self else { return }
-      self.requestedApply = desiredID
+      guard !Task.isCancelled, let self, !self.stopped, let desiredID = self.desiredID else {
+        return
+      }
+      self.requestedApply = ApplyRequest(id: desiredID, advancesRotation: false)
       await self.drain()
     }
   }
@@ -315,7 +387,7 @@ struct DisplayResult: Identifiable {
       let url = try SkyRenderer.render(
         card: selected, imageURL: catalog.imageURL(selected),
         size: CGSize(width: 2560, height: 1440), language: language, mode: mode,
-        directory: directory.appendingPathComponent("exports"))
+        directory: directory.appendingPathComponent("exports"), framing: framing)
       try Data(contentsOf: url).write(to: destination, options: .atomic)
       status = .exportDone
     } catch { status = .failure }

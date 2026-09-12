@@ -117,12 +117,12 @@ import Testing
     model.rotation = 3600
     desktop.failures = ["a", "b"]
     await model.rotationTick()
-    let target = model.selectedID
+    let target = defaults.string(forKey: "pendingRotationID")
     #expect(model.status == .failure)
     #expect(defaults.string(forKey: "pendingRotationID") == target)
     desktop.failures = []
     await model.rotationTick()
-    #expect(model.selectedID == target)
+    #expect(defaults.string(forKey: "appliedID") == target)
     #expect(model.status == .applied)
     #expect(defaults.string(forKey: "pendingRotationID") == nil)
     let count = desktop.applied.count
